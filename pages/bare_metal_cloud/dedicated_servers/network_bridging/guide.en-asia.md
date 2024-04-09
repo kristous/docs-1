@@ -68,11 +68,11 @@ After a few seconds, a virtual MAC will appear in the "Virtual MAC" column of yo
 
 To configure your virtual machines for internet access, you will need to know the gateway of your host machine (i.e. your dedicated server). The gateway IP address is made up of the first three octets of your server's main IP address, with 254 as the last octet. For example, if your server's main IP address was:
 
-- 169.254.10.20
+- 203.0.113.0
 
 Your gateway address would therefore be:
 
-- 169.254.10.**254**
+- 203.0.113.**254**
 
 You can also retrieve the gateway via the [OVHcloud Control Panel](#viacontrolpanel) or the [OVHcloud API](#viaapi).
 
@@ -133,9 +133,10 @@ Now you can start the VM and proceed with the configuration steps, depending on 
 
 ### Step 4: Configure the virtual machines
 
-#### Debian
+#### Debian (excluding Debian 12)
 
-Connect to the shell of your virtual machine. Open the virtual machine's network configuration file located in `/etc/network/interfaces`. 
+Connect to the shell of your virtual machine. Open the virtual machine's network configuration file located in `/etc/network/interfaces` or `/etc/network/interfaces.d` depending on the version of the operating you are using. For demonstration purposes, our file is called `50-cloud-init.yaml`.
+
 Edit the file so that it reflects the configuration below (please remember to fill in your own values).
 
 - For older distributions:
@@ -267,7 +268,7 @@ nameserver 213.186.33.99
 
 Save and close the file, then reboot your virtual machine.
 
-#### Ubuntu 18.04
+#### Debian 12, Ubuntu 20.04 and following
 
 First, open a terminal on your virtual machine and open the network configuration file located in `/etc/netplan/` with the following command. For demonstration purposes, our file is called `50-cloud-init.yaml`.
 
