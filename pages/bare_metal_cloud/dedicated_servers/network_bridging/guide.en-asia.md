@@ -1,7 +1,7 @@
 ---
 title: 'Configuring a network bridge'
 excerpt: 'Find out how to configure your virtual machines for access to the public internet'
-updated: 2023-11-24
+updated: 2024-04-16
 ---
 
 > [!primary]
@@ -30,14 +30,16 @@ Bridged networking can be used to configure your virtual machines. Some tweaking
 >
 > This guide is not applicable to servers of the ranges [Scale](https://www.ovhcloud.com/asia/bare-metal/scale/) and [High Grade](https://www.ovhcloud.com/asia/bare-metal/high-grade/).
 > 
-> Please visit the dedicated [configuration page](/pages/bare_metal_cloud/dedicated_servers/proxmox-network-HG-Scale).
+> Refer to the following guides instead: [Configuring the network on ESXi on the High Grade & SCALE ranges](/pages/bare_metal_cloud/dedicated_servers/esxi-network-HG-Scale), [Configuring the network on Proxmox VE on the High Grade & SCALE ranges](/pages/bare_metal_cloud/dedicated_servers/proxmox-network-HG-Scale) and [Configuring the network on Windows Server with Hyper-V on the High Grade & SCALE ranges](/pages/bare_metal_cloud/dedicated_servers/hyperv-network-HG-Scale).
+>
 
 ## Instructions
 
 The basic steps are always the same, independent of the underlying system:
 
 - creating a virtual MAC address for an Additional IP
-- setting the MAC of the VM to that new virtual MAC address
+- creating a VM on a host
+- setting the MAC address of the VM to that new virtual MAC address
 - configuring the **IP address**, **netmask**, **gateway** and **route to the gateway** inside the VM
 
 Code samples in the following instructions have to be replaced with your own values:
@@ -106,7 +108,7 @@ For all operating systems and distributions, you **must** configure your virtual
 
 > [!warning]
 >
-> The following instructions apply to a previously created VM with an OS already installed. If you have not created a VM, please review the options on the [Qemu/KVM Virtual Machine](https://pve.proxmox.com/wiki/Qemu/KVM_Virtual_Machines){.external} page by Proxmox, create a VM, and install an OS.
+> The following instructions apply to a previously created VM with an OS already installed. If you have not created a VM, please review the options on the [Qemu/KVM Virtual Machine](https://pve.proxmox.com/wiki/Qemu/KVM_Virtual_Machines){.external} page by Proxmox.
 >
 
 After creating the VM and while it is still powered off, right-click the VM and click `Edit settings`.
@@ -118,7 +120,7 @@ After creating the VM and while it is still powered off, right-click the VM and 
 
 ![navigate to Network Device](images/proxmox_01.png){.thumbnail}
 
-Then add the vMAC address created previously.
+Then add the virtual MAC address created previously.
 
 ![open Network Device](images/proxmox_02.png){.thumbnail}
 
@@ -135,7 +137,7 @@ After you've created the virtual machine and while it's powered off, right click
 
 ![VM context menu](images/vmware_01.png){.thumbnail}
 
-Fold out `Netwok Adapter 1`, change the value in the `MAC Address` drop-down menu to `Manual` and enter the MAC address created previously.
+Fold out `Netwok Adapter 1`, change the value in the `MAC Address` drop-down menu to `Manual` and enter the virtual MAC address created previously.
 
 ![Edit settings](images/vmware_02.png){.thumbnail}
 
@@ -171,7 +173,7 @@ sudo rm -f /etc/network/interfaces
 sudo cp /etc/network/interfaces.bak /etc/network/interfaces
 ```
 
-Edit the file so that it reflects the configuration below, replace `INTERFACE-NAME`, `ADDITIONAL_IP` and `GATEWAY_IP` with your own values.
+Edit the file so that it reflects the configuration below, replace `INTERFACE_NAME`, `ADDITIONAL_IP` and `GATEWAY_IP` with your own values.
 
 > [!primary]
 > 
@@ -187,8 +189,8 @@ auto lo
 iface lo inet loopback
 
 # The primary network interface
-auto INTERFACE-NAME
-iface INTERFACE-NAME inet static
+auto INTERFACE_NAME
+iface INTERFACE_NAME inet static
 address ADDITIONAL_IP
 netmask 255.255.255.255
 gateway GATEWAY_IP
@@ -226,61 +228,7 @@ sudo systemctl restart networking
 
 To test that the VM is fully connected to the Internet, `ping example.com`. If you get a response, you are good to go. If you do not, restart your VM and attempt the ping again.
 
-#### Red Hat and Red Hat-based operating systems (CentOS 6.X, etc)
-
-By default the virtual machine's network configuration file located in `/etc/sysconfig/network-scripts`.  In our example the interface file is called `ifcfg-eth0`.
-
-Once you are connected to the shell of your virtual machine, run the following command to identify your interface name:
-
-```bash
-ls /sys/class/net
-```
-
-Next, make a copy of the configuration file, so that you can revert at any time:
-
-```bash
-sudo cp /etc/sysconfig/network-scripts/ifcfg-eth0 /etc/sysconfig/network-scripts/ifcfg-eth0.bak
-```
-
-In case of a mistake, you will be able to revert the changes, using the commands below:
-
-```bash
-sudo rm -f etc/sysconfig/network-scripts/ifcfg-eth0
-sudo cp /etc/sysconfig/network-scripts/ifcfg-eth0.bak etc/sysconfig/network-scripts/ifcfg-eth0
-```
-
-Edit the file so that it reflects the configuration below (please remember to fill in your own values).
-
-```bash
-sudo vi /etc/sysconfig/network-scripts/ifcfg-eth0
-```
-
-```console
-DEVICE=eth0
-BOOTPROTO=none
-ONBOOT=yes
-USERCTL=no
-IPV6INIT=no
-PEERDNS=yes
-TYPE=Ethernet
-NETMASK=255.255.255.255
-IPADDR=ADDITIONAL_IP
-GATEWAY=GATEWAY_IP
-ARP=yes
-HWADDR=MY:VI:RT:UA:LM:AC
-```
-
-Save and close the file.<br>
-Next, open the virtual machine's routing file, which is located in `/etc/sysconfig/network-scripts/route-eth0`. Edit the file so that it reflects the configuration below (please remember to fill in your own values).
-
-```console
-GATEWAY_IP dev eth0
-default via GATEWAY_IP dev eth0
-```
-
-Save and close the file, then reboot your virtual machine.
-
-#### CentOS 7
+#### Red Hat and Red Hat-based operating systems (CentOS, Rocky Linux, Alma Linux, etc.)
 
 By default, the virtual machine's network configuration file is located in `/etc/sysconfig/network-scripts/`. For demonstration purposes, our file is called `ifcfg-eth0`:
 
@@ -337,17 +285,19 @@ DNS=213.186.33.99
 >
 
 Save and close the file.<br>
-Next, create a new file, `route-(interface-name)`, in the `/etc/sysconfig/network-scripts/` directory and define the following default routes for the interface using the gateway defined in [Step 2](#determinegateway). 
+Next, create a new file, `route-(interface_name)`, in the `/etc/sysconfig/network-scripts/` directory and define the following default routes for the interface using the gateway defined in [Step 2](#determinegateway). 
 
-In our example our file is called `route-eth0`, remember to fill in your own values:
+In our example our file is called `route-eth0` (replace `eth0` with your own values):
 
 ```bash
 sudo vi /etc/sysconfig/network-scripts/route-eth0
 ```
 
+Edit the file so that it reflects the configuration below, replace `GATEWAY_IP` with your own value.
+
 ```console
-203.0.113.254 dev eth0
-default via 203.0.113.254 dev eth0
+GATEWAY_IP dev eth0
+default via GATEWAY_IP dev eth0
 ```
 
 Save and close the file.<br>
@@ -404,7 +354,7 @@ Save and close the file, then reboot your virtual machine.
 
 To test that the VM is fully connected to the Internet, ping example.com. If you get a response, you are good to go. If you do not, restart your VM and attempt the ping again.
 
-#### Ubuntu 18.04
+#### Ubuntu
 
 First, access the console to connect to your virtual machine and run the following command to identify your interface name:
 
