@@ -1,7 +1,7 @@
 ---
 title: Moving an Additional IP
 excerpt: Find out how to move an Additional IP in the Control Panel or via the OVHcloud API
-updated: 2022-12-20
+updated: 2024-05-27
 ---
 
 > [!primary]
@@ -16,9 +16,8 @@ Additional IP addresses can be moved between the services you use. This provides
 With this technology, you can switch IP addresses from one solution to another in less than a minute, with virtually no interruption to services for your users. It is useful for service migrations (e.g. moving projects from development to production), or when switching to a backup server during a technical issue.
 
 > [!primary]
-> An Additional IP cannot be moved from one zone to another. For example, an IP located in the SBG data centre can be moved to GRA or RBX, but cannot be moved to BHS.
->
 > Migration only works for whole blocks, it is not possible to migrate individual IPs within a block.
+>
 
 **This guide explains how to move an Additional IP in your OVHcloud Control Panel or via the OVHcloud API.**
 
@@ -48,6 +47,16 @@ With this technology, you can switch IP addresses from one solution to another i
 >
 > If an IP block is moved/added to the vRack, it is no longer linked to a physical server. In this case, any virtual MAC address will be lost during the transfer.
 >
+
+**Before proceeding, take note of the following terminology and conditions:**
+
+**Region location:** Country of the Geolocated IP. For example, Europe (France - Paris), Europe (Germany - Limburg), North America (US - East - Vint Hill), Asia Pacific (Singapore -Singapore), etc.
+**Region:** Region of the Geolocated IP. For example, eu-west-par, eu-central-waw, ca-east-bhs, ap-southeast-sgp etc.
+
+- An additional IP can be moved between regions located in the same region location. For example, an IP located in the region eu-west-par (France) can be moved to any region eu-west-xxx (France).
+- An additional IP cannot be moved between different region locations. For example, an additional IP located in the region location Europe cannot be moved to the region location North America or Asia Pacific. 
+- An additional IP cannot be moved between region locations in Europe with the exception of France and Germany. For example, an IP located in the region eu-west-par (Europe - France) cannot be moved to any region location like Europe-Poland, Europe-UK, but can be moved to Europe - Germany.
+- An additional IP located in any region location in Europe, can be moved to the region locations France and Germany. For example, an IP located in Poland, UK, or Germany can be moved to Fnance
 
 ### Moving an IP from the OVHcloud Control Panel
 
