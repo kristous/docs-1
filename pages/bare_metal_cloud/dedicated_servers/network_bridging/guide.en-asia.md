@@ -1,7 +1,7 @@
 ---
 title: 'Configuring a network bridge'
 excerpt: 'Find out how to configure your virtual machines for access to the public internet'
-updated: 2024-04-16
+updated: 2024-06-12
 ---
 
 > [!primary]
@@ -137,7 +137,7 @@ After you've created the virtual machine and while it's powered off, right click
 
 ![VM context menu](images/vmware_01.png){.thumbnail}
 
-Fold out `Netwok Adapter 1`, change the value in the `MAC Address` drop-down menu to `Manual` and enter the virtual MAC address created previously.
+Fold out `Network Adapter 1`, change the value in the `MAC Address` drop-down menu to `Manual` and enter the virtual MAC address created previously.
 
 ![Edit settings](images/vmware_02.png){.thumbnail}
 
@@ -175,11 +175,6 @@ sudo cp /etc/network/interfaces.bak /etc/network/interfaces
 
 Edit the file so that it reflects the configuration below, replace `INTERFACE_NAME`, `ADDITIONAL_IP` and `GATEWAY_IP` with your own values.
 
-> [!primary]
-> 
-> The DNS name server listed is from OVHcloud. Feel free to use the name server(s) you prefer.
->
-
 ```bash
 sudo nano /etc/network/interfaces
 ```
@@ -194,7 +189,6 @@ iface INTERFACE_NAME inet static
 address ADDITIONAL_IP
 netmask 255.255.255.255
 gateway GATEWAY_IP
-dns-nameservers 213.186.33.99
 ```
 
 **Example**
@@ -209,12 +203,23 @@ iface ens192 inet static
 address 192.0.2.1
 netmask 255.255.255.255
 gateway 203.0.113.254
-dns-nameservers 213.186.33.99
 ```
 
-Save and close the file.
+Save and close the file.<br>
+Next, edit or create the file `/etc/resolv.conf`:
 
-Now you will need to bring your NIC online. To do so, enter the following command (replace `ens192` with your own values):
+```bash
+sudo nano /etc/resolv.conf
+```
+
+Add the following line:
+
+```console
+nameserver 213.186.33.99
+```
+
+Save and close the file.<br>
+Now you will need to bring your network interface online. To do so, enter the following command (replace `ens192` with your own values):
 
 ```bash
 sudo ip link set ens192 up
@@ -309,6 +314,48 @@ sudo systemctl restart network
 ```
 
 To test that the VM is fully connected to the Internet, ping example.com. If you get a response, you are good to go. If you do not, restart your VM and attempt the ping again.
+
+#### Rocky Linux 9 and Alma Linux 9
+
+In the previous versions Rocky Linux and Alma Linux, network profiles were stored in ifcfg format in this directory: /etc/sysconfig/network-scripts/. However, the ifcfg format is now deprecated and has been replaced keyfiles. By default, NetworkManager no longer creates new profiles in this format. The configuration file is now found in /etc/NetworkManager/system-connections/.
+
+For demonstration purposes, our file is called `ens18-nmconnection`:
+
+Once you are connected to the shell of your virtual machine, run the following command to identify your interface name:
+
+```bash
+ls /sys/class/net
+```
+
+Next, make a copy of the configuration file, so that you can revert at any time:
+
+```bash
+sudo cp /etc/NetworkManager/system-connections/ens18-nmconnection /etc/NetworkManager/system-connections/ens18-nmconnection.bak
+```
+
+In case of a mistake, you will be able to revert the changes, using the commands below:
+
+```bash
+sudo rm -f /etc/NetworkManager/system-connections/ens18-nmconnection
+sudo cp /etc/NetworkManager/system-connections/ens18-nmconnection.bak /etc/NetworkManager/system-connections/ens18-nmconnection
+```
+
+Edit the file so that it reflects the configuration below, replace `ADDITIONAL_IP` and `GATEWAY_IP` with your own values. In this example, the interface name is `ens18`. Replace this value if it does not apply.
+
+```console
+[ipv4]
+method=auto
+may-fail=false
+address1=ADDITIONAL_IP/32
+gateway=GATEWAY_IP
+```
+
+Save and close the file.<br>
+Restart your network interface with the following command:
+
+```bash
+sudo systemctl restart NetworkManager
+```
 
 #### FreeBSD 12.0
 
@@ -479,3 +526,4 @@ Next, ping your Additional IP address from an external device.
 ## Go further
 
 Join our community of users on <https://community.ovh.com/en/>.
+
