@@ -1,7 +1,7 @@
 ---
 title: 'DNS-Server eines OVHcloud Domainnamens ändern'
 excerpt: 'Erfahren Sie hier, wie Sie DNS-Server im OVHcloud Kundencenter bearbeiten'
-updated: 2023-08-25
+updated: 2024-06-12
 ---
 
 > [!primary]
@@ -11,34 +11,9 @@ updated: 2023-08-25
 
 ## Ziel
 
-### DNS verstehen 
-
 **D**omain **N**ame **S**ystem bezeichnet einen Satz von Elementen (DNS-Server, DNS-Zonen, etc.), mit denen ein Domainname IP-Adressen zugeordnet werden kann.
 
-### DNS-Server 
-
-Die **DNS-Server** enthalten DNS-Konfigurationsdateien für Domainnamen, die als **DNS-Zonen** bezeichnet werden.
-
-Eine DNS-Zone enthält technische Informationen, die als DNS-Einträge bezeichnet werden.
-
-Sie können beispielsweise Folgendes angeben:
-
-- Die IP-Adresse (DNS-Einträge vom Typ *A* und *AAAA*) Ihres Hostings muss in der Zone eingetragen sein, damit Ihre Webseite angezeigt wird, wenn der Domainnamenname in einen Browser eingegeben wird.
-- Die E-Mail-Server (DNS-Einträge vom Typ *MX*), die E-Mails erhalten sollen, die an Adressen mit diesem Domainnamen versendet wurden. Wenn Sie die MX-Einträge Ihres Domainnamens konfigurieren, können Sie E-Mails über Ihre personalisierten E-Mail-Adressen empfangen.
-- Informationen zur Sicherheit/Authentifizierung von Diensten (Webhosting, Webserver, E-Mail-Server, etc.), die mit Ihrem Domainnamen verbunden sind (DNS-Einträge vom Typ *SPF*, *DKIM*, *DMARC*, etc.).
-
-Weitere Informationen zu den DNS-Zonen finden Sie in unserer [Dokumentation zu DNS](/pages/web_cloud/domains/dns_zone_edit).
-
-Aus diesem Grund müssen die **DNS-Server** beim Domainnamen angemeldet sein, um die von ihnen gehostete DNS-Zone verwenden zu können. 
-
-![DNS](images/dns-server.png){.thumbnail}
-
-**DNS-Server** werden üblicherweise in Paaren eingesetzt:
-
-- *Primärer* DNS-Server: Er leitet die vom Domainnamen empfangenen Anfragen auf die von ihm gehostete DNS-Zone. Damit wird die *DNS-Auflösung* durchgeführt, um eingehenden Traffic auf die passenden Dienste (Server, Website, E-Mails, etc.) zu leiten.
-- *Sekundärer* DNS-Server: Kann als *Backup*-Server verwendet werden, wenn der *Primäre* DNS-Server mit Anfragen überlastet ist, nicht verfügbar ist oder langsamer antwortet als der *Sekundäre* DNS-Server.
-
-DNS-Provider können auch drei oder mehr **DNS-Server** einsetzen, die alle deklariert werden müssen, um die betroffene DNS-Zone zu aktivieren.
+Weitere Informationen finden Sie in unseren Anleitungen „[Was ist ein DNS-Server?](/pages/web_cloud/domains/dns_server_general_information)“ und „[Was ist eine DNS-Zone?](/pages/web_cloud/domains/dns_zone_general_information)“.
 
 **Diese Anleitung erklärt, wie Sie die DNS-Server eines OVHcloud Domainnamens ändern.**
 
@@ -123,14 +98,20 @@ Mit dem Button `DNS-Server zurücksetzen`{.action} können Sie die aktuellen DNS
 Nachdem die erforderlichen Änderungen vorgenommen wurden, dauert es eine gewisse Zeit, bis diese effektiv sind. Dabei sind zwei aufeinanderfolgende Vorgänge zu beachten:
 
 - Die bei OVHcloud vorgenommene Änderung muss von der Registry, die Ihre Domainendung verwaltet, übernommen werden (z.B. der DENIC für *.de*). Sie können den Fortschritt dieser Operation in Ihrem [OVHcloud Kundencenter](/links/manager) nachverfolgen, indem Sie im Bereich `Domainnnamen`{.action} auf `Laufende Vorgänge`{.action} klicken.
-- Nachdem die Registry Ihrer Domainendung die Änderung angenommen hat, ist eine Propagationszeit von maximal 48 Stunden erforderlich, bis sie voll wirksam ist.
+- Nachdem die Registry Ihrer Domainendung die Änderung angenommen hat, ist eine Propagationszeit von maximal **48 Stunden** erforderlich, bis sie voll wirksam ist.
 
 ## Weiterführende Informationen
+
+[Was ist ein DNS-Server?](/pages/web_cloud/domains/dns_zone_general_information)
+
+[Was ist eine DNS-Zone?](/pages/web_cloud/domains/dns_zone_general_information)
+
+[DNS-Einträge](/pages/web_cloud/domains/dns_zone_records)
 
 [Bearbeiten einer OVHcloud DNS-Zone](/pages/web_cloud/domains/dns_zone_edit).
 
 Kontaktieren Sie für spezialisierte Dienstleistungen (SEO, Web-Entwicklung etc.) die [OVHcloud Partner](/links/partner).
-
+ 
 Wenn Sie Hilfe bei der Nutzung und Konfiguration Ihrer OVHcloud Lösungen benötigen, beachten Sie unsere [Support-Angebote](/links/support).
-
-Für den Austausch mit unserer User Community gehen Sie auf <https://community.ovh.com/en/>.
+ 
+Treten Sie unserer [User Community](/links/community) bei.
